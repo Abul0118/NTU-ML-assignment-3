@@ -36,17 +36,17 @@ bash script/run_problem1.sh
 
 Build a baseline medical image segmentation model using a lightweight CNN-based UNet.
 
-Approach
+### Approach
 
-We designed a 3-level UNet with:
+- We designed a 3-level UNet with:
 
-Convolutional encoder
+- Convolutional encoder
 
-Symmetric decoder
+- Symmetric decoder
 
-Skip connections
+- Skip connections
 
-1×1 convolution output head
+- 1×1 convolution output head
 
 The model is computationally lightweight (base=16 channels), making it suitable for CPU execution while still capturing essential multi-scale features.
 
