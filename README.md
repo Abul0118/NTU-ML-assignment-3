@@ -187,6 +187,9 @@ bash script/run_problem1.sh
 ## 🔍 Self-Supervised Learning
 
 
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/15378d10-ffd9-4e0f-bc2e-22f460142e80" />
+
+
 
 <table>
   <tr>
