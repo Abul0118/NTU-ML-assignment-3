@@ -1,24 +1,33 @@
 name: cnn_unet
+
 transform:
   resized_imaged:
-    size: [448, 576]
+    height: 256
+    width: 256
+
 train_dataset:
   data_dir: dataset/train
   has_label: true
+
 valid_dataset:
   data_dir: dataset/train
   has_label: true
+
 train_loader:
-  batch_size: 16
+  batch_size: 4       # Heavy UNet → reduce batch to avoid CUDA OOM
   num_workers: 4
   shuffle: true
+
 valid_loader:
   batch_size: 1
-  num_workers: 1
+  num_workers: 0
   shuffle: false
+
 optimizer:
-  lr: 0.0001
+  lr: 0.0005          # Lower LR = smoother convergence for large UNet
+
 trainer:
-  n_epoch: 100
+  n_epoch: 80         # Heavy UNet needs longer training (80 is safe)
+
 checkpoint:
-  path: cnn_unet_best.pth
+  path: checkpoints/cnn_unet_best.pth
