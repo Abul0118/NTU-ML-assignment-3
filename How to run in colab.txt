@@ -1,0 +1,181 @@
+Run the below code in cells in collab:
+--------------------------------------
+
+!unzip assignment-3-Abul0118-main.zip
+%cd assignment-3-Abul0118-main
+
+
+!pip install uv
+!uv sync
+
+
+%cd /content/assignment-3-Abul0118-main
+!mkdir -p checkpoints
+
+
+from google.colab import drive    #upload your dataset in your drive
+drive.mount('/content/drive')
+
+
+%cd /content/assignment-3-Abul0118-main
+
+
+!mkdir data
+
+
+!ln -s "/content/drive/MyDrive/ML Assignment 3/dataset/train/image" ./data/train_images
+!ln -s "/content/drive/MyDrive/ML Assignment 3/dataset/train/label" ./data/train_masks
+!ln -s "/content/drive/MyDrive/ML Assignment 3/dataset/public/image" ./data/test_images
+
+
+!ls data/train_images | head
+
+
+%cd /content
+!ls
+
+
+%cd /content/assignment-3-Abul0118-main
+
+
+!ls scripts
+
+!ls data
+
+
+!ls data/train_images | head
+!ls data/train_masks  | head
+
+
+
+%cd /content/assignment-3-Abul0118-main
+!mkdir -p data
+
+
+%cd /content/assignment-3-Abul0118-main
+!mkdir -p dataset/train dataset/public dataset/private
+!ln -sf "/content/drive/MyDrive/ML Assignment 3/dataset/train/image" dataset/train/image
+!ln -sf "/content/drive/MyDrive/ML Assignment 3/dataset/train/label" dataset/train/label
+!ln -sf "/content/drive/MyDrive/ML Assignment 3/dataset/public/image" dataset/public/image
+!ln -sf "/content/drive/MyDrive/ML Assignment 3/dataset/private/image" dataset/private/image
+
+
+!ls dataset/train/image | head
+!ls dataset/train/label | head
+
+
+%cd /content
+!ls
+
+
+%cd /content/assignment-3-Abul0118-main
+
+
+!pip install uv wandb
+!uv sync
+
+
+
+!sed -i 's/\r$//' scripts/run_train.sh
+!sed -i 's/\r$//' scripts/run_problem1.sh
+!sed -i 's/\r$//' scripts/run_problem2.sh
+
+
+-------------------------------------------------------
+PROBLEM-1
+
+train.py
+-----
+from src.model import UNetSmall
+model = UNetSmall(in_ch=1, out_ch=1, base=16)
+
+run_train.sh
+-----
+#!/bin/bash
+
+uv run train.py --config cnn_unet
+
+
+run_problem1.sh
+-----
+#!/bin/bash
+
+# Usage:
+# bash scripts/run_problem1.sh --config cnn_unet
+
+CONFIG=$2
+
+PUBLIC_DIR="dataset/public"
+PRIVATE_DIR="dataset/private"
+
+echo "Generating submission using config: $CONFIG"
+echo "Public dir: $PUBLIC_DIR"
+echo "Private dir: $PRIVATE_DIR"
+
+uv run generate_submission.py \
+    --config $CONFIG \
+    --public_dir $PUBLIC_DIR \
+    --private_dir $PRIVATE_DIR
+
+echo "✅ Submission saved to submission.csv"
+-----------------------------------------------------------------------------------
+
+!bash scripts/run_train.sh --config cnn_unet
+
+
+!bash scripts/run_problem1.sh --config cnn_unet
+--------------------------------------------------------------------------------
+PROBLEM-2
+
+train.py
+-----
+from src.model_transformer_unet import build_model
+model = build_model()
+
+
+run_train.sh
+-----
+#!/bin/bash
+uv run train.py --config transformer_unet
+
+
+
+run_problem2.sh
+-----
+#TODO: Please refer to run_problem1.sh for the content of this file
+#!/bin/bash
+
+CONFIG=$2
+PUBLIC_DIR="dataset/public"
+PRIVATE_DIR="dataset/private"
+
+echo "Generating submission using config: $CONFIG"
+echo "Public dir: $PUBLIC_DIR"
+echo "Private dir: $PRIVATE_DIR"
+
+uv run generate_submission.py \
+    --config $CONFIG \
+    --public_dir $PUBLIC_DIR \
+    --private_dir $PRIVATE_DIR
+
+echo "✅ Submission saved to submission.csv"
+
+
+
+----------------------------------------------------------------
+
+!bash scripts/run_train.sh --config transformer_unet
+
+!bash scripts/run_problem2.sh --config transformer_unet
+------------------------------------------------------------------
+
+Follow problem 2 for problem 3 
+
+1. pretrain ssl 
+   !bash scripts/run_ssl_pretrain.sh --config model_ssl_encoder
+
+2. !bash scripts/run_train.sh --config transformer_unet
+
+3. !bash scripts/run_problem3.sh --config transformer_unet
+
+
