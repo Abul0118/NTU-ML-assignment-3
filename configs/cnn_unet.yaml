@@ -2,11 +2,12 @@ name: cnn_unet
 
 transform:
   resized_imaged:
+    # Final training resolution — fits Colab & assignment
     height: 256
     width: 256
 
 train_dataset:
-  data_dir: dataset/train
+  data_dir: dataset/train     # do NOT add /image here — assignment code handles keys
   has_label: true
 
 valid_dataset:
@@ -14,8 +15,8 @@ valid_dataset:
   has_label: true
 
 train_loader:
-  batch_size: 4       # Heavy UNet → reduce batch to avoid CUDA OOM
-  num_workers: 4
+  batch_size: 8               # CPU/Colab friendly
+  num_workers: 2              # Must be 0 in Colab
   shuffle: true
 
 valid_loader:
@@ -24,10 +25,10 @@ valid_loader:
   shuffle: false
 
 optimizer:
-  lr: 0.0005          # Lower LR = smoother convergence for large UNet
+  lr: 0.001                   # Better for UNet-small on CPU
 
 trainer:
-  n_epoch: 80         # Heavy UNet needs longer training (80 is safe)
+  n_epoch: 5                 # 100 too long on CPU; you can resume later
 
 checkpoint:
   path: checkpoints/cnn_unet_best.pth
