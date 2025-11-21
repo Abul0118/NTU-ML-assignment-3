@@ -1,0 +1,23 @@
+name: ssl_pretrain
+
+train_dataset:
+  data_dir: dataset/train
+  has_label: false      # SSL has no labels
+
+train_loader:
+  batch_size: 32
+  num_workers: 4
+  shuffle: true
+
+optimizer:
+  lr: 0.0003
+
+ssl:
+  task: rotation         # 0°, 90°, 180°, 270°
+  num_classes: 4
+
+trainer:
+  n_epoch: 50
+
+checkpoint:
+  path: ssl_pretrained_encoder.pth
