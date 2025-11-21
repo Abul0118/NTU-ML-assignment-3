@@ -36,8 +36,9 @@ bash script/run_problem1.sh
 
 
 ### Problem 2: Trnasformer + UNet
-Please include the figure of your model architecture here.
-(e.g., a diagram illustrating how Transformer layers are integrated into UNet.)
+
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/4835be3a-5817-4f3b-804b-5ee5851a416a" />
+
 
 
 ## Model Configuration
@@ -113,7 +114,74 @@ Please include the figure of your model architecture here.
 
 
 ### Problem 2: Trnasformer + UNet
-Provide your model configuration and hyperparameters here. (e.g., Transformer depth, attention heads, patch size, hidden dimensions, and training details, etc.)
+
+<table>
+  <tr>
+    <td><b>Component</b></td>
+    <td><b>Value</b></td>
+  </tr>
+
+  <tr>
+    <td>Model</td>
+    <td>TransformerUNet (base=32, 1 Transformer Block)</td>
+  </tr>
+
+  <tr>
+    <td>Input Size</td>
+    <td>224 × 224</td>
+  </tr>
+
+  <tr>
+    <td>Loss Function</td>
+    <td>Dice + BCE (combined)</td>
+  </tr>
+
+  <tr>
+    <td>Optimizer</td>
+    <td>Adam</td>
+  </tr>
+
+  <tr>
+    <td>Learning Rate</td>
+    <td>0.0001</td>
+  </tr>
+
+  <tr>
+    <td>LR Scheduler</td>
+    <td>CosineAnnealingLR (T_max = 50)</td>
+  </tr>
+
+  <tr>
+    <td>Epochs</td>
+    <td>50</td>
+  </tr>
+
+  <tr>
+    <td>Train Batch Size</td>
+    <td>8</td>
+  </tr>
+
+  <tr>
+    <td>Valid Batch Size</td>
+    <td>1</td>
+  </tr>
+
+  <tr>
+    <td>Transforms</td>
+    <td>Load → ToTensor → Resize(224×224)</td>
+  </tr>
+
+  <tr>
+    <td>Special Step</td>
+    <td>Flatten features → TransformerBlock → reshape back</td>
+  </tr>
+
+  <tr>
+    <td>Checkpoint Path</td>
+    <td>checkpoints/transformer_unet_best.pth</td>
+  </tr>
+</table>
+
 
 
 ## 🔍 Self-Supervised Learning
