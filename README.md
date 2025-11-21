@@ -32,6 +32,24 @@ bash script/run_problem1.sh
 
 ### Problem 1: Simple-CNN UNet
 
+Objective
+
+Build a baseline medical image segmentation model using a lightweight CNN-based UNet.
+
+Approach
+
+We designed a 3-level UNet with:
+
+Convolutional encoder
+
+Symmetric decoder
+
+Skip connections
+
+1×1 convolution output head
+
+The model is computationally lightweight (base=16 channels), making it suitable for CPU execution while still capturing essential multi-scale features.
+
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/c9cf6b13-ce50-4e04-aafe-cec357774b30" />
 
 
