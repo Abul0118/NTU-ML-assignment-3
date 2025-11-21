@@ -32,7 +32,7 @@ bash script/run_problem1.sh
 
 ### Problem 1: Simple-CNN UNet
 
-Objective
+### Objective
 
 Build a baseline medical image segmentation model using a lightweight CNN-based UNet.
 
