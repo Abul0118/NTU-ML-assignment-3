@@ -31,8 +31,9 @@ bash script/run_problem1.sh
 ## 🧠 Model Architecture
 
 ### Problem 1: Simple-CNN UNet
-Please include the figure of your model architecture here.
-(e.g., a diagram of your CNN-based UNet structure.)
+
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/c9cf6b13-ce50-4e04-aafe-cec357774b30" />
+
 
 ### Problem 2: Trnasformer + UNet
 Please include the figure of your model architecture here.
@@ -42,7 +43,74 @@ Please include the figure of your model architecture here.
 ## Model Configuration
 
 ### Problem 1: Simple-CNN UNet
-Provide your model configuration and hyperparameters here. (e.g., number of epochs, epoch, batch size, optimizer, learning rate, and learning rate scheduler.)
+
+<table>
+  <tr>
+    <td><b>Component</b></td>
+    <td><b>Value</b></td>
+  </tr>
+
+  <tr>
+    <td>Model</td>
+    <td>UNetSmall (base=16)</td>
+  </tr>
+
+  <tr>
+    <td>Input Size</td>
+    <td>256 × 256</td>
+  </tr>
+
+  <tr>
+    <td>Loss Function</td>
+    <td>Dice + BCE (combined)</td>
+  </tr>
+
+  <tr>
+    <td>Optimizer</td>
+    <td>Adam</td>
+  </tr>
+
+  <tr>
+    <td>Learning Rate</td>
+    <td>0.001</td>
+  </tr>
+
+  <tr>
+    <td>LR Scheduler</td>
+    <td>CosineAnnealingLR (T_max = 5)</td>
+  </tr>
+
+  <tr>
+    <td>Epochs</td>
+    <td>5</td>
+  </tr>
+
+  <tr>
+    <td>Train Batch Size</td>
+    <td>8</td>
+  </tr>
+
+  <tr>
+    <td>Valid Batch Size</td>
+    <td>1</td>
+  </tr>
+
+  <tr>
+    <td>Shuffle</td>
+    <td>Train = True, Valid = False</td>
+  </tr>
+
+  <tr>
+    <td>Transforms</td>
+    <td>Load → ToTensor → Resize(256×256)</td>
+  </tr>
+
+  <tr>
+    <td>Checkpoint Path</td>
+    <td>checkpoints/cnn_unet_best.pth</td>
+  </tr>
+</table>
+
 
 ### Problem 2: Trnasformer + UNet
 Provide your model configuration and hyperparameters here. (e.g., Transformer depth, attention heads, patch size, hidden dimensions, and training details, etc.)
