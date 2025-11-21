@@ -9,8 +9,8 @@ from torchvision.transforms import Compose
 from tqdm import tqdm
 
 from src.dataset import MedicalImageDataset, LoadImaged, ToTensord, ResizeImaged
-# from src.model import YOUR_MODEL
 from src.utils import dict_to_device, set_random_seed
+from src.model_transformer_unet import build_model
 
 
 def parse_arguments() -> Namespace:
@@ -25,7 +25,6 @@ def rle(image: np.ndarray) -> str:
     indices = np.where(image.flatten(order='F'))[0] + 1
     if len(indices) == 0:
         return "-1"
-
     prev, code = -1, []
     for ind in indices:
         if ind > prev + 1:
@@ -37,41 +36,55 @@ def rle(image: np.ndarray) -> str:
     return ' '.join(map(str, code))
 
 
-def infer(dataset, model, device):
+def infer(dataset, model, device, prefix):
     pred_dict = {}
     model.eval()
     with torch.inference_mode():
         for data in tqdm(dataset):
             data = dict_to_device(data, device)
-            # TODO: Implement inference step
-            code = rle(pred)
-            pred_dict[data["filename"]] = code
+            image = data["image"].unsqueeze(0)
+            preds = model(image)
+            preds = torch.sigmoid(preds)
+            preds = (preds > 0.5).float()
+            preds = preds.squeeze().cpu().numpy()
+
+            code = rle(preds)
+            filename = data["filename"]
+            pred_dict[f"{prefix}_{filename}"] = code
     return pred_dict
+
 
 
 if __name__ == "__main__":
     set_random_seed()
     args = parse_arguments()
     config = OmegaConf.load(Path("configs", f"{args.config}.yaml"))
+
     transform = Compose(
         [
             LoadImaged(keys=["image"]),
             ToTensord(keys=["image"]),
-            ResizeImaged(keys=["image"], **config.transform.resized_imaged),
+            ResizeImaged(keys=["image"], size=(config.transform.resized_imaged.height, config.transform.resized_imaged.width)),
         ]
     )
+
     public_dataset = MedicalImageDataset(data_dir=args.public_dir, has_label=False, transform=transform)
     private_dataset = MedicalImageDataset(data_dir=args.private_dir, has_label=False, transform=transform)
 
-    #TODO: Prepare the model for inference
-    model = YOUR_MODEL
+    # ✅ Load model
+    model = build_model()
     model.load_state_dict(torch.load(config.checkpoint.path))
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
-    public_pred = infer(public_dataset, model, device)
-    private_pred = infer(private_dataset, model, device)
-    all_pred = public_pred | private_pred
+    public_pred = infer(public_dataset, model, device, "public")
+    private_pred = infer(private_dataset, model, device, "private")
+    all_pred = {**public_pred, **private_pred}
     df = pd.DataFrame.from_dict(all_pred, orient="index", columns=["label"])
+    df.index = df.index.str.replace("public_", "").str.replace("private_", "")
     df.index.name = "row ID"
     df.reset_index().to_csv("submission.csv", index=False)
+
+
+    print("✅ submission.csv created!")
