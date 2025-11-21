@@ -55,6 +55,28 @@ The model is computationally lightweight (base=16 channels), making it suitable 
 
 ### Problem 2: Trnasformer + UNet
 
+### Objective
+
+Enhance the UNet baseline by integrating self-attention through a Transformer block to improve global feature modeling.
+
+### Approach
+
+We extend the UNet by adding a TransformerBlock inside the bottleneck:
+
+1. Bottleneck features (B,256,28,28) are flattened into sequence form (B,784,256)
+
+2. A 4-head Multi-Head Attention TransformerBlock processes global context
+
+3. The output is reshaped back and decoded through UNet upsampling layers
+
+This allows the model to capture:
+
+- Long-range feature dependencies
+
+- Better anatomical structure relationships
+
+- Richer context than a purely convolutional model
+
 <img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/4835be3a-5817-4f3b-804b-5ee5851a416a" />
 
 
@@ -133,6 +155,7 @@ The model is computationally lightweight (base=16 channels), making it suitable 
 
 ### Problem 2: Trnasformer + UNet
 
+
 <table>
   <tr>
     <td><b>Component</b></td>
@@ -204,6 +227,42 @@ The model is computationally lightweight (base=16 channels), making it suitable 
 
 ## 🔍 Self-Supervised Learning
 
+### Objective
+
+Improve segmentation performance by pretraining the encoder using Self-Supervised Learning (SSL) on unlabeled medical images.
+
+### Approach (Two-Stage Training)
+Stage 1 — SSL Pretraining (Denoising Autoencoder)
+
+- Add Gaussian noise to input images
+
+- Train an autoencoder to reconstruct the clean image
+
+- Loss used: MSE (reconstruction loss)
+
+- Pretrained encoder layer (enc1) is saved
+
+Stage 2 — Supervised Segmentation (Fine-Tuning)
+
+- Load SSL encoder weights into TransformerUNet.enc1
+
+- Fine-tune using labeled data
+
+- Loss used: Dice + BCE
+
+- Leads to much better initialization than random weights
+
+Benefits of SSL
+
+- Learns texture, edges, and anatomical patterns before segmentation
+
+- Improves representation quality
+
+- Faster convergence
+
+- Higher Dice Score
+
+- More stable training with fewer failures
 
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/15378d10-ffd9-4e0f-bc2e-22f460142e80" />
 
