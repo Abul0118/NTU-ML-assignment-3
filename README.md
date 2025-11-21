@@ -334,27 +334,25 @@ Include the following plots:
   </tr>
   <tr>
     <td>❌</td>
-    <td>0.3126</td>
+    <td>0.0312</td>
   </tr>
   <tr>
     <td>✅</td>
-    <td>0.3200</td>
+    <td>0.0320</td>
   </tr>
 <table>
 
 ### Loss Ablations
 <table>
   <tr>
-    <td>Loss</td>
+    <td>Loss Function</td>
+    <td>Train Loss</td>
     <td>Validation DSC</td>
   </tr>
   <tr>
-    <td>Binary Cross-Entropy</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Dice Loss</td>
-    <td></td>
+    <td>Dice + BCE </td>
+    <td>0.3068</td>
+    <td>0.0320</td>
   </tr>
 <table>
 
