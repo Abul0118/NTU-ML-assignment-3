@@ -185,11 +185,46 @@ bash script/run_problem1.sh
 
 
 ## 🔍 Self-Supervised Learning
-Describe the design of your self-supervised learning method here. You may include:
-- The pretext task or objective
-- Model architecture
-- Loss function and training strategy
-- How it benefits the downstream segmentation task
+
+
+
+<table>
+  <tr>
+    <td><b>Component</b></td>
+    <td><b>Description</b></td>
+  </tr>
+
+  <tr>
+    <td>Pretext Task</td>
+    <td>Denoising Autoencoder (reconstruct clean image from noisy)</td>
+  </tr>
+
+  <tr>
+    <td>Architecture</td>
+    <td>3-level Conv Autoencoder, Enc1 matches TransformerUNet Enc1</td>
+  </tr>
+
+  <tr>
+    <td>Loss Function</td>
+    <td>MSELoss</td>
+  </tr>
+
+  <tr>
+    <td>Training</td>
+    <td>20 epochs, Adam(1e-3), Gaussian noise σ = 0.1, dataset without labels</td>
+  </tr>
+
+  <tr>
+    <td>Knowledge Transfer</td>
+    <td>Copy SSL enc1 → TransformerUNet.enc1 for fine-tuning</td>
+  </tr>
+
+  <tr>
+    <td>Benefit</td>
+    <td>Better initialization, faster convergence, higher DSC</td>
+  </tr>
+</table>
+
 
 
 ## 📈 Learning Curve
