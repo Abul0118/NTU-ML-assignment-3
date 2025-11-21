@@ -310,10 +310,18 @@ Benefits of SSL
 ## 📈 Learning Curve
 Include the following plots:
 - Learning rate (per step)
+
+<img width="5056" height="2656" alt="W B Chart 11_21_2025, 11_22_18 PM" src="https://github.com/user-attachments/assets/6d093a99-6f63-4fe8-bbf8-196a8915fc6e" />
+
+
 - Training loss (per step)
+
+<img width="5056" height="2656" alt="W B Chart 11_21_2025, 11_22_29 PM" src="https://github.com/user-attachments/assets/5036d821-a611-4b88-89ce-6f9a967faec1" />
+
 - Validation Dice Score (per epoch)
-> [!TIP]
-> You can download these logs and plots directly from Weights & Biases (wandb).
+
+<img width="5056" height="2656" alt="W B Chart 11_21_2025, 11_20_34 PM" src="https://github.com/user-attachments/assets/95f5f877-6c4c-45d2-b395-fdd89dc4ed0a" />
+
 
 
 ## 🧪 Experiment Results
@@ -326,11 +334,11 @@ Include the following plots:
   </tr>
   <tr>
     <td>❌</td>
-    <td></td>
+    <td>0.3126</td>
   </tr>
   <tr>
     <td>✅</td>
-    <td></td>
+    <td>0.3200</td>
   </tr>
 <table>
 
@@ -359,18 +367,18 @@ Include the following plots:
   </tr>
   <tr>
     <td>UNet + CNN</td>
-    <td></td>
-    <td></td>
+    <td>0.0315</td>
+    <td>0.2896</td>
   </tr>
   <tr>
     <td>UNet + Transformer</td>
-    <td></td>
-    <td></td>
+    <td>0.0317</td>
+    <td>0.3472</td>
   </tr>
   <tr>
     <td>UNet + Transformer + SSL</td>
-    <td></td>
-    <td></td>
+    <td>0.0320</td>
+    <td>0.4397</td>
   </tr>
 <table>
 
