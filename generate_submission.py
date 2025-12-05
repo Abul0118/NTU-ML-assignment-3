@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from src.dataset import MedicalImageDataset, LoadImaged, ToTensord, ResizeImaged
 from src.utils import dict_to_device, set_random_seed
-from src.model_transformer_unet import build_model
+from src.model import UNetSmall
 
 
 def parse_arguments() -> Namespace:
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     private_dataset = MedicalImageDataset(data_dir=args.private_dir, has_label=False, transform=transform)
 
     # ✅ Load model
-    model = build_model()
+    model = UNetSmall(in_ch=1, out_ch=1, base=16)
     model.load_state_dict(torch.load(config.checkpoint.path))
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
