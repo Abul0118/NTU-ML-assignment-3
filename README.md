@@ -58,7 +58,7 @@ bash scripts/run_problem3.sh --config transformer_unet_ssl
 
 **NOTE : Try to run the code in Colab , Already .ipynb file attached need to change some code and paths , easy for evaluation and submission file generation**
 
-## 🧠 Model Architecture
+## 🧠 Model Architecture 
 
 ### Problem 1: Simple-CNN UNet
 
