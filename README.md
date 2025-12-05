@@ -17,14 +17,16 @@ If you wish to use any additional packages, please obtain approval from the TA b
 ## 🏋️ Training
 To start training:
 ```
-bash script/run_train.sh
+bash scripts/run_train.sh
 ```
 
+## Checkpoints drive link
+https://drive.google.com/drive/folders/1PHAQzjuSVXZZ3hXJMS-ECtd6YRri78EI?usp=drive_link
 
 ## 📦 Generating Submission
 To generate predictions for submission:
 ```
-bash script/run_problem1.sh
+bash scripts/run_problem1.sh
 ```
 
 
