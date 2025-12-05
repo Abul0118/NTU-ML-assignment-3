@@ -25,10 +25,38 @@ https://drive.google.com/drive/folders/1PHAQzjuSVXZZ3hXJMS-ECtd6YRri78EI?usp=dri
 
 ## 📦 Generating Submission
 To generate predictions for submission:
+Problem 1 :
+Use SmallUNet 
 ```
-bash scripts/run_problem1.sh
+from src.model import UNetSmall
+model = UNetSmall(in_ch=1, out_ch=1, base=16)
+```
+in generate_submission.py
+
+```
+bash scripts/run_problem1.sh --config cnn_unet
 ```
 
+Problem 2 :
+
+change in generate_submission.py (replace the model with transformer_unet)
+```
+from src.model_transformer_unet import build_model
+model = build_model()
+````
+```
+bash scripts/run_problem2.sh --config transformer_unet
+```
+
+Problem 3 :
+
+Keep the same as problem 2
+
+```
+bash scripts/run_problem3.sh --config transformer_unet_ssl
+```
+
+**NOTE : Try to run the code in Colab , Already .ipynb file attached need to change some code and paths , easy for evaluation and submission file generation**
 
 ## 🧠 Model Architecture
 
