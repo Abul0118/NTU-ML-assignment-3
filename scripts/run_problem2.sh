@@ -1,8 +1,19 @@
 #TODO: Please refer to run_problem1.sh for the content of this file
-#TODO: Please refer to run_problem1.sh for the content of this file
-#!/bin/bash
+# Usage:
+# bash scripts/run_problem2.sh --config transformer_unet
 
-# TODO: Download your checkpoint by gdown and unzip it here if needed
+CONFIG=$2
 
-# Run the submission generation script
-python generate_submission.py  --config transformer_unet --public_dir "${1}" --private_dir "${2}"
+PUBLIC_DIR="dataset/public"
+PRIVATE_DIR="dataset/private"
+
+echo "Generating submission using config: $CONFIG"
+echo "Public dir: $PUBLIC_DIR"
+echo "Private dir: $PRIVATE_DIR"
+
+uv run generate_submission.py \
+    --config $CONFIG \
+    --public_dir $PUBLIC_DIR \
+    --private_dir $PRIVATE_DIR
+
+echo "✅ Submission saved to submission.csv"
