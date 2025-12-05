@@ -3,6 +3,8 @@ Run the below code in cells in collab: (or) Use ML3_collab.ipynb file , change t
 checkpoints link : https://drive.google.com/drive/folders/1PHAQzjuSVXZZ3hXJMS-ECtd6YRri78EI?usp=drive_link
 
 as well as change the generate_submission.py with the correct model
+
+I have uploaded the dataset in the google drive and mounted in google colab 
 --------------------------------------
 
 !unzip assignment-3-Abul0118-main.zip
@@ -142,6 +144,7 @@ Follow problem 2 for problem 3
 2. !bash scripts/run_train.sh --config transformer_unet
 
 3. !bash scripts/run_problem3.sh --config transformer_unet
+
 
 
 
