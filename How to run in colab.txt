@@ -1,6 +1,8 @@
 Run the below code in cells in collab: (or) Use ML3_collab.ipynb file , change the paths and create checkpoints folder and upload the paths from link
 
 checkpoints link : https://drive.google.com/drive/folders/1PHAQzjuSVXZZ3hXJMS-ECtd6YRri78EI?usp=drive_link
+
+as well as change the generate_submission.py with the correct model
 --------------------------------------
 
 !unzip assignment-3-Abul0118-main.zip
@@ -89,8 +91,11 @@ PROBLEM-1
 
 you can also try cnn_unet(heavy) recommended for you using GPU by rename it and compile
 
-train.py
+train.py and
 -----
+
+generate_submission.py (replace with this lines)
+
 from src.model import UNetSmall
 model = UNetSmall(in_ch=1, out_ch=1, base=16)
 
@@ -109,6 +114,9 @@ PROBLEM-2
 
 train.py
 -----
+
+generate_submission.py (replace with this lines) and for problem 3 is also same.
+
 from src.model_transformer_unet import build_model
 model = build_model()
 
@@ -134,6 +142,7 @@ Follow problem 2 for problem 3
 2. !bash scripts/run_train.sh --config transformer_unet
 
 3. !bash scripts/run_problem3.sh --config transformer_unet
+
 
 
 
