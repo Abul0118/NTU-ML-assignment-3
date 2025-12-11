@@ -86,7 +86,7 @@ drive.mount('/content/drive')
 !sed -i 's/\r$//' scripts/run_problem1.sh
 !sed -i 's/\r$//' scripts/run_problem2.sh
 
-
+(Below are Training related codes and bashes)
 -------------------------------------------------------
 PROBLEM-1
 
@@ -95,8 +95,7 @@ you can also try cnn_unet(heavy) recommended for you using GPU by rename it and 
 
 train.py and
 -----
-
-generate_submission.py (replace with this lines)
+(replace with this lines)
 
 from src.model import UNetSmall
 model = UNetSmall(in_ch=1, out_ch=1, base=16)
@@ -116,8 +115,7 @@ PROBLEM-2
 
 train.py
 -----
-
-generate_submission.py (replace with this lines) and for problem 3 is also same.
+(replace with this lines) and for problem 3 is also same.
 
 from src.model_transformer_unet import build_model
 model = build_model()
@@ -144,6 +142,7 @@ Follow problem 2 for problem 3
 2. !bash scripts/run_train.sh --config transformer_unet
 
 3. !bash scripts/run_problem3.sh --config transformer_unet
+
 
 
 
