@@ -1,17 +1,15 @@
 import torch
 import torch.nn as nn
 
-# -----------------------------------------
-# Double Convolution Block
-# -----------------------------------------
 class DoubleConv(nn.Module):
     def __init__(self, in_ch, out_ch):
         super().__init__()
         self.block = nn.Sequential(
-            nn.Conv2d(in_ch, out_ch, 3, padding=1),
+            nn.Conv2d(in_ch, out_ch, kernel_size=3, padding=1, bias=False),
             nn.BatchNorm2d(out_ch),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_ch, out_ch, 3, padding=1),
+
+            nn.Conv2d(out_ch, out_ch, kernel_size=3, padding=1, bias=False),
             nn.BatchNorm2d(out_ch),
             nn.ReLU(inplace=True),
         )
@@ -19,97 +17,114 @@ class DoubleConv(nn.Module):
     def forward(self, x):
         return self.block(x)
 
-# -----------------------------------------
-# Simple Transformer Block
-# -----------------------------------------
+
+class MultiHeadSelfAttention(nn.Module):
+    def __init__(self, dim, heads=4):
+        super().__init__()
+        self.heads = heads
+        self.d = dim // heads
+        self.scale = self.d ** -0.5
+
+        self.qkv = nn.Linear(dim, dim * 3)
+        self.proj = nn.Linear(dim, dim)
+
+    def forward(self, x):
+        B, N, C = x.shape
+
+        qkv = self.qkv(x).reshape(B, N, 3, self.heads, self.d)
+        q, k, v = qkv.unbind(dim=2)
+
+        q = q.transpose(1, 2)
+        k = k.transpose(1, 2)
+        v = v.transpose(1, 2)
+
+        attn = (q @ k.transpose(-2, -1)) * self.scale
+        attn = attn.softmax(dim=-1)
+
+        out = (attn @ v).transpose(1, 2).reshape(B, N, C)
+        return self.proj(out)
+
+
 class TransformerBlock(nn.Module):
-    def __init__(self, dim, heads=4, mlp_ratio=2.0):
+    def __init__(self, dim, heads=4):
         super().__init__()
         self.norm1 = nn.LayerNorm(dim)
-        self.attn = nn.MultiheadAttention(dim, heads, batch_first=True)
+        self.attn = MultiHeadSelfAttention(dim, heads=heads)
 
-        hidden = int(dim * mlp_ratio)
+        # MUST MATCH CHECKPOINT → MLP hidden dim = 512
         self.norm2 = nn.LayerNorm(dim)
-
         self.mlp = nn.Sequential(
-            nn.Linear(dim, hidden),
+            nn.Linear(dim, 512),
             nn.GELU(),
-            nn.Linear(hidden, dim),
+            nn.Linear(512, dim),
         )
 
     def forward(self, x):
-        y, _ = self.attn(self.norm1(x), self.norm1(x), self.norm1(x))
-        x = x + y
+        x = x + self.attn(self.norm1(x))
         x = x + self.mlp(self.norm2(x))
         return x
 
-# -----------------------------------------
-# Transformer UNet
-# -----------------------------------------
-class TransformerUNet(nn.Module):
 
-    def __init__(self, in_ch=1, out_ch=1, base=32):
+class TransformerUNet(nn.Module):
+    def __init__(self):
         super().__init__()
 
-        # Encoder
-        self.enc1 = DoubleConv(in_ch, base)
-        self.pool1 = nn.MaxPool2d(2)
+        self.enc1 = DoubleConv(1, 32)
+        self.enc2 = DoubleConv(32, 64)
+        self.enc3 = DoubleConv(64, 128)
 
-        self.enc2 = DoubleConv(base, base * 2)
-        self.pool2 = nn.MaxPool2d(2)
+        self.pool = nn.MaxPool2d(2)
 
-        self.enc3 = DoubleConv(base * 2, base * 4)
-        self.pool3 = nn.MaxPool2d(2)
+        self.bottleneck_conv = DoubleConv(128, 256)
 
-        # Bottleneck
-        self.bottleneck = DoubleConv(base * 4, base * 8)
+        self.transformer_blocks = nn.Sequential(
+            TransformerBlock(256),
+            TransformerBlock(256),
+        )
 
-        self.transformer = TransformerBlock(dim=base * 8, heads=4)
+        self.up3 = nn.ConvTranspose2d(256, 128, 2, 2)
+        self.dec3 = DoubleConv(256, 128)
 
-        # Decoder
-        self.up3 = nn.ConvTranspose2d(base * 8, base * 4, 2, stride=2)
-        self.dec3 = DoubleConv(base * 8, base * 4)
+        self.up2 = nn.ConvTranspose2d(128, 64, 2, 2)
+        self.dec2 = DoubleConv(128, 64)
 
-        self.up2 = nn.ConvTranspose2d(base * 4, base * 2, 2, stride=2)
-        self.dec2 = DoubleConv(base * 4, base * 2)
+        self.up1 = nn.ConvTranspose2d(64, 32, 2, 2)
+        self.dec1 = DoubleConv(64, 32)
 
-        self.up1 = nn.ConvTranspose2d(base * 2, base, 2, stride=2)
-        self.dec1 = DoubleConv(base * 2, base)
-
-        self.final = nn.Conv2d(base, out_ch, 1)
+        self.out_conv = nn.Conv2d(32, 1, 1)
 
     def forward(self, x):
         e1 = self.enc1(x)
-        p1 = self.pool1(e1)
+        p1 = self.pool(e1)
 
         e2 = self.enc2(p1)
-        p2 = self.pool2(e2)
+        p2 = self.pool(e2)
 
         e3 = self.enc3(p2)
-        p3 = self.pool3(e3)
+        p3 = self.pool(e3)
 
-        b = self.bottleneck(p3)
+        b = self.bottleneck_conv(p3)
 
         B, C, H, W = b.shape
-        t = b.flatten(2).permute(0, 2, 1)
+        tokens = b.flatten(2).transpose(1, 2)
 
-        t = self.transformer(t)
-
-        b = t.permute(0, 2, 1).reshape(B, C, H, W)
+        tokens = self.transformer_blocks(tokens)
+        b = tokens.transpose(1, 2).reshape(B, C, H, W)
 
         d3 = self.up3(b)
-        d3 = torch.cat([d3, e3], dim=1)
+        d3 = torch.cat([d3, e3], 1)
         d3 = self.dec3(d3)
 
         d2 = self.up2(d3)
-        d2 = torch.cat([d2, e2], dim=1)
+        d2 = torch.cat([d2, e2], 1)
         d2 = self.dec2(d2)
 
         d1 = self.up1(d2)
-        d1 = torch.cat([d1, e1], dim=1)
+        d1 = torch.cat([d1, e1], 1)
         d1 = self.dec1(d1)
 
-        return self.final(d1)
+        return self.out_conv(d1)
+
 
 def build_model():
     return TransformerUNet()
