@@ -42,7 +42,7 @@ def infer(dataset, model, device, prefix):
     with torch.inference_mode():
         for data in tqdm(dataset):
             data = dict_to_device(data, device)
-            image = data["image"].unsqueeze(0)
+            image = data["image"].unsqueeze(0)   # (1,1,H,W)
             preds = model(image)
             preds = torch.sigmoid(preds)
             preds = (preds > 0.5).float()
@@ -54,7 +54,6 @@ def infer(dataset, model, device, prefix):
     return pred_dict
 
 
-
 if __name__ == "__main__":
     set_random_seed()
     args = parse_arguments()
@@ -64,15 +63,51 @@ if __name__ == "__main__":
         [
             LoadImaged(keys=["image"]),
             ToTensord(keys=["image"]),
-            ResizeImaged(keys=["image"], size=(config.transform.resized_imaged.height, config.transform.resized_imaged.width)),
+            ResizeImaged(keys=["image"], size=(
+                config.transform.resized_imaged.height,
+                config.transform.resized_imaged.width
+            )),
         ]
     )
 
-    public_dataset = MedicalImageDataset(data_dir=args.public_dir, has_label=False, transform=transform)
-    private_dataset = MedicalImageDataset(data_dir=args.private_dir, has_label=False, transform=transform)
+    public_dataset = MedicalImageDataset(
+        data_dir=args.public_dir, has_label=False, transform=transform
+    )
+    private_dataset = MedicalImageDataset(
+        data_dir=args.private_dir, has_label=False, transform=transform
+    )
 
-    # ✅ Load model
-    model = UNetSmall(in_ch=1, out_ch=1, base=16)
+    # -----------------------------------------------------------
+    # 🔥 MODEL SWITCHING BASED ON CONFIG.NAME (ONLY THIS ADDED)
+    # -----------------------------------------------------------
+    if config.name == "cnn_unet":
+        from src.model import UNetSmall
+        model = UNetSmall(in_ch=1, out_ch=1, base=16)
+
+    elif config.name == "transformer_unet":
+        from src.model_transformer_unet import build_model
+        model = build_model()
+
+    elif config.name == "transformer_unet_ssl":
+        from src.model_transformer_unet import build_model
+        model = build_model()
+
+        print("🔁 Loading SSL encoder weights into TransformerUNet.enc1 ...")
+        ssl_state = torch.load("checkpoints/ssl_enc1.pth", map_location="cpu")
+        model.enc1.load_state_dict(ssl_state, strict=False)
+
+    elif config.name == "transformer_unet_ssl_aug":
+        from src.model_transformer_unet import build_model
+        model = build_model()
+
+        print("🔁 Loading SSL encoder weights into TransformerUNet.enc1 (AUG MODE) ...")
+        ssl_state = torch.load("checkpoints/ssl_enc1.pth", map_location="cpu")
+        model.enc1.load_state_dict(ssl_state, strict=False)
+
+    else:
+        raise ValueError(f"❌ Unknown config.name: {config.name}")
+
+    
     model.load_state_dict(torch.load(config.checkpoint.path))
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -81,10 +116,10 @@ if __name__ == "__main__":
     public_pred = infer(public_dataset, model, device, "public")
     private_pred = infer(private_dataset, model, device, "private")
     all_pred = {**public_pred, **private_pred}
+
     df = pd.DataFrame.from_dict(all_pred, orient="index", columns=["label"])
     df.index = df.index.str.replace("public_", "").str.replace("private_", "")
     df.index.name = "row ID"
     df.reset_index().to_csv("submission.csv", index=False)
-
 
     print("✅ submission.csv created!")
